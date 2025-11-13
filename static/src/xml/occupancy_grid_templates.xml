@@ -102,7 +102,7 @@
                             📍 Location Details: <t t-esc="location.name"/>
                         </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                            <span aria-hidden="true">×</span>
                         </button>
                     </div>
                     
@@ -189,14 +189,6 @@
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">
                             Close
                         </button>
-                        <!-- Optional: Add action buttons -->
-                        <!--
-                        <t t-if="location.order">
-                            <button type="button" class="btn btn-primary">
-                                View Order
-                            </button>
-                        </t>
-                        -->
                     </div>
                 </div>
             </div>
