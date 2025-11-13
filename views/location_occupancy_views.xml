@@ -17,6 +17,7 @@
                 <field name="pr1_zone" string="Zone"/>
                 <field name="occupancy_status" string="Status" invisible="0"/>
                 <field name="occupancy_order_name" string="Order"/>
+                <field name="occupancy_transport_unit" string="Transport Box"/>
                 <field name="occupancy_customer" string="Customer"/>
                 <field name="occupancy_duration_hours" string="Duration (h)" widget="float_time"/>
             </tree>
