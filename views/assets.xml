@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Load JavaScript and CSS assets for grid dashboard -->
+    <template id="assets_backend" name="occupancy_grid_assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <!-- CSS -->
+            <link rel="stylesheet" type="text/css" href="/personalizirai_location_occupancy/static/src/css/occupancy_grid.css"/>
+            
+            <!-- JavaScript -->
+            <script type="text/javascript" src="/personalizirai_location_occupancy/static/src/js/occupancy_grid_widget.js"></script>
+        </xpath>
+    </template>
+</odoo>
