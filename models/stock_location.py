@@ -54,6 +54,12 @@ class StockLocation(models.Model):
         store=False,
         help="How long location has been in current status")
     
+    occupancy_transport_unit = fields.Char(
+        string='Transport Unit',
+        compute='_compute_occupancy_status',
+        store=False,
+        help="Transport box/unit code")
+    
     # ============================================
     # STATISTICS - 7 Day History (Phase 4)
     # ============================================
@@ -156,10 +162,12 @@ class StockLocation(models.Model):
         """
         Compute real-time occupancy status with BATCH optimization.
         
-        OPTIMIZED: Uses batch queries instead of individual searches.
-        - Single query for all quants
-        - Single query for all orders
-        - Much faster, prevents database locks
+        LOGIC:
+        - OCCUPIED: Order has transport_unit_id (physical box assigned)
+        - RESERVED: Order assigned but no transport_unit_id yet
+        - FREE: No order assigned
+        
+        OPTIMIZED: Uses batch query instead of individual searches.
         """
         # Filter only PR-1 locations
         pr1_locations = self.filtered(lambda l: l.location_id.id == 19 or l.id == 19)
@@ -173,17 +181,9 @@ class StockLocation(models.Model):
             return
         
         try:
-            # BATCH QUERY 1: Get all quants for these locations
+            # BATCH QUERY: Get all orders assigned to these locations
+            # Including transport_unit_id for OCCUPIED detection
             location_ids = pr1_locations.ids
-            quants = self.env['stock.quant'].search([
-                ('location_id', 'in', location_ids),
-                ('quantity', '>', 0)
-            ])
-            
-            # Map: location_id -> has_stock
-            locations_with_stock = {q.location_id.id for q in quants}
-            
-            # BATCH QUERY 2: Get all orders assigned to these locations
             orders = self.env['sale.order'].search([
                 ('source_location_id', 'in', location_ids),
                 ('state', 'in', ['manufactured', 'ready_package', 'ready_picking'])
@@ -192,34 +192,30 @@ class StockLocation(models.Model):
             # Map: location_id -> order
             location_order_map = {o.source_location_id.id: o for o in orders}
             
-            # Now process each location with the cached data
+            # Process each location with the cached data
             for location in pr1_locations:
-                has_stock = location.id in locations_with_stock
                 order = location_order_map.get(location.id)
                 
-                if has_stock:
-                    # OCCUPIED: Has physical stock
-                    location.occupancy_status = 'occupied'
-                    if order:
-                        location._populate_order_info(order)
+                if order:
+                    # Check if order has transport unit (box)
+                    if order.transport_unit_id:
+                        # OCCUPIED: Has physical box assigned
+                        location.occupancy_status = 'occupied'
+                        location._populate_order_info(order, has_transport_unit=True)
+                        _logger.debug(f"🔴 Location {location.name} OCCUPIED - Order {order.name} has transport unit {order.transport_unit_id.name}")
                     else:
-                        location.occupancy_order_id = False
-                        location.occupancy_order_name = 'Unknown'
-                        location.occupancy_magento_id = False
-                        location.occupancy_customer = 'Unknown'
-                        location.occupancy_since = False
-                        location.occupancy_duration_hours = 0.0
-                elif order:
-                    # RESERVED: Assigned but no stock
-                    location.occupancy_status = 'reserved'
-                    location._populate_order_info(order)
+                        # RESERVED: Order assigned but no box yet
+                        location.occupancy_status = 'reserved'
+                        location._populate_order_info(order, has_transport_unit=False)
+                        _logger.debug(f"🟡 Location {location.name} RESERVED - Order {order.name} waiting for transport unit")
                 else:
-                    # FREE: Not assigned, no stock
+                    # FREE: Not assigned
                     location.occupancy_status = 'free'
                     location._set_default_occupancy_values()
+                    _logger.debug(f"🟢 Location {location.name} FREE")
                     
         except Exception as e:
-            _logger.error(f"Error in batch occupancy computation: {str(e)}")
+            _logger.error(f"❌ Error in batch occupancy computation: {str(e)}", exc_info=True)
             # Set defaults for all on error
             for location in pr1_locations:
                 location._set_default_occupancy_values()
@@ -233,8 +229,9 @@ class StockLocation(models.Model):
         self.occupancy_customer = False
         self.occupancy_since = False
         self.occupancy_duration_hours = 0.0
+        self.occupancy_transport_unit = False
     
-    def _populate_order_info(self, order):
+    def _populate_order_info(self, order, has_transport_unit=False):
         """Helper to populate order-related fields"""
         self.occupancy_order_id = order.id
         self.occupancy_order_name = order.name
@@ -246,6 +243,16 @@ class StockLocation(models.Model):
             self.occupancy_magento_id = False
         
         self.occupancy_customer = order.partner_id.name if order.partner_id else 'Unknown'
+        
+        # Get transport unit info if exists
+        if has_transport_unit and order.transport_unit_id:
+            try:
+                transport_unit = order.transport_unit_id
+                self.occupancy_transport_unit = f"{transport_unit.name} ({transport_unit.code})"
+            except:
+                self.occupancy_transport_unit = "BOX-???"
+        else:
+            self.occupancy_transport_unit = False
         
         # Use order write_date as approximation (faster than tracking search)
         self.occupancy_since = order.write_date
