@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     
-    <!-- Tree View: Simple Location List -->
+    <!-- Tree View: PR-1 Location List -->
     <record id="view_stock_location_occupancy_tree" model="ir.ui.view">
         <field name="name">stock.location.occupancy.tree</field>
         <field name="model">stock.location</field>
-        <field name="priority">20</field>
+        <field name="priority">1</field>
         <field name="arch" type="xml">
             <tree string="PR-1 Location Occupancy" 
                   create="false" 
@@ -27,7 +27,7 @@
     <record id="view_stock_location_occupancy_search" model="ir.ui.view">
         <field name="name">stock.location.occupancy.search</field>
         <field name="model">stock.location</field>
-        <field name="priority">20</field>
+        <field name="priority">1</field>
         <field name="arch" type="xml">
             <search string="Location Occupancy">
                 <field name="name"/>
@@ -51,6 +51,8 @@
         <field name="name">PR-1 Location Occupancy</field>
         <field name="res_model">stock.location</field>
         <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_stock_location_occupancy_tree"/>
+        <field name="search_view_id" ref="view_stock_location_occupancy_search"/>
         <field name="domain">[('is_pr1_location', '=', True)]</field>
         <field name="context">{'search_default_filter_not_free': 1}</field>
     </record>
