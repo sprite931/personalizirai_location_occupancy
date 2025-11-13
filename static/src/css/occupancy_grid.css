@@ -1,5 +1,6 @@
 /* ============================================================
    PersonaliziRai Location Occupancy Grid Dashboard Styles
+   Physical Warehouse Layout (Row A & Row B)
    ============================================================ */
 
 /* --- Container & Layout --- */
@@ -10,7 +11,7 @@
 }
 
 .occupancy-grid-container {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
 }
 
@@ -111,70 +112,145 @@
     100% { transform: rotate(360deg); }
 }
 
-/* --- Zone Container --- */
-.zone-container {
+/* ============================================================
+   ROW CONTAINER - Physical warehouse row (Редица A/B)
+   ============================================================ */
+
+.row-container {
     background: white;
     padding: 25px;
     margin-bottom: 30px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-left: 5px solid #007bff;
 }
 
-.zone-header {
+/* Alternate colors for rows */
+.row-container:nth-child(1) {
+    border-left-color: #007bff; /* Blue for Row A */
+}
+
+.row-container:nth-child(2) {
+    border-left-color: #6f42c1; /* Purple for Row B */
+}
+
+/* Row Header */
+.row-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 3px solid #e9ecef;
 }
 
-.zone-title {
-    font-size: 20px;
+.row-title {
+    font-size: 22px;
     font-weight: bold;
     color: #333;
+    margin: 0;
 }
 
-.zone-title .zone-emoji {
-    margin-right: 10px;
-}
-
-.zone-count {
+.row-count {
     font-size: 14px;
     color: #666;
     background: #f8f9fa;
-    padding: 4px 12px;
-    border-radius: 12px;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-weight: 600;
 }
 
-/* --- Grid Layout --- */
-.zone-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 44px);
-    gap: 4px;
-    justify-content: start;
+/* ============================================================
+   ROW GRID - Contains all levels (E → D → C → B → A)
+   ============================================================ */
+
+.row-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-/* Alternative: Fixed 10-column layout for consistency */
-.zone-grid.grid-10-col {
-    grid-template-columns: repeat(10, 44px);
+/* ============================================================
+   LEVEL ROW - Single level (e.g., Ниво E)
+   ============================================================ */
+
+.level-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #dee2e6;
 }
 
-/* --- Location Box --- */
+/* Different left border colors for levels (visual depth) */
+.level-row:nth-child(1) { border-left-color: #dc3545; } /* E - Red (top) */
+.level-row:nth-child(2) { border-left-color: #fd7e14; } /* D - Orange */
+.level-row:nth-child(3) { border-left-color: #ffc107; } /* C - Yellow */
+.level-row:nth-child(4) { border-left-color: #20c997; } /* B - Teal */
+.level-row:nth-child(5) { border-left-color: #28a745; } /* A - Green (bottom) */
+
+/* Level Label (left side) */
+.level-label {
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.level-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.level-info {
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Level Locations (horizontal grid) */
+.level-locations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+}
+
+/* Empty level state */
+.level-empty {
+    padding: 8px 16px;
+    color: #999;
+    font-style: italic;
+    font-size: 13px;
+}
+
+/* ============================================================
+   LOCATION BOX - Individual warehouse position
+   ============================================================ */
+
 .location-box {
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
     border: 2px solid transparent;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* Status Colors */
@@ -196,8 +272,8 @@
 /* Hover Effect */
 .location-box:hover {
     transform: scale(1.15);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 100;
     border-color: #333;
 }
 
@@ -210,7 +286,7 @@
 .location-box::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: 100%;
+    bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0,0,0,0.9);
@@ -222,7 +298,6 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s;
-    margin-bottom: 5px;
     z-index: 1000;
 }
 
@@ -233,11 +308,14 @@
 /* Location Label */
 .location-label {
     text-align: center;
-    line-height: 1;
+    line-height: 1.2;
     text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-/* --- Details Modal --- */
+/* ============================================================
+   DETAILS MODAL
+   ============================================================ */
+
 .location-details-modal .modal-content {
     border-radius: 8px;
 }
@@ -300,32 +378,78 @@
     margin-bottom: 20px;
 }
 
-/* --- Responsive Design --- */
+/* ============================================================
+   RESPONSIVE DESIGN
+   ============================================================ */
 
-/* Tablet (1024px and below) */
-@media (max-width: 1024px) {
+/* Large Desktop (1400px+) - Default */
+
+/* Desktop (1200px - 1400px) */
+@media (max-width: 1400px) {
+    .occupancy-grid-container {
+        max-width: 1200px;
+    }
+    
+    .location-box {
+        width: 46px;
+        height: 46px;
+        font-size: 9px;
+    }
+}
+
+/* Laptop (1024px - 1200px) */
+@media (max-width: 1200px) {
     .occupancy-grid-dashboard {
         padding: 15px;
     }
     
+    .level-label {
+        min-width: 120px;
+    }
+    
+    .location-box {
+        width: 44px;
+        height: 44px;
+        font-size: 9px;
+    }
+    
+    .level-locations {
+        gap: 5px;
+    }
+}
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
     .grid-summary {
         flex-direction: column;
         align-items: flex-start;
     }
     
-    .zone-grid {
-        grid-template-columns: repeat(auto-fill, 42px);
-        gap: 3px;
+    .row-container {
+        padding: 20px;
+    }
+    
+    .level-label {
+        min-width: 100px;
+        font-size: 12px;
+    }
+    
+    .level-name {
+        font-size: 16px;
     }
     
     .location-box {
         width: 42px;
         height: 42px;
-        font-size: 9px;
+        font-size: 8px;
+    }
+    
+    .level-locations {
+        gap: 4px;
     }
 }
 
-/* Mobile (768px and below) */
+/* Mobile (480px - 768px) */
 @media (max-width: 768px) {
     .grid-title {
         font-size: 20px;
@@ -335,9 +459,19 @@
         gap: 15px;
     }
     
-    .zone-grid {
-        grid-template-columns: repeat(auto-fill, 38px);
-        gap: 2px;
+    .row-title {
+        font-size: 18px;
+    }
+    
+    .level-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .level-label {
+        width: 100%;
+        min-width: auto;
     }
     
     .location-box {
@@ -346,12 +480,13 @@
         font-size: 8px;
     }
     
-    .zone-title {
-        font-size: 18px;
+    .level-locations {
+        gap: 3px;
+        width: 100%;
     }
 }
 
-/* Small mobile (480px and below) */
+/* Small Mobile (< 480px) */
 @media (max-width: 480px) {
     .occupancy-grid-dashboard {
         padding: 10px;
@@ -361,12 +496,8 @@
         padding: 15px;
     }
     
-    .zone-container {
+    .row-container {
         padding: 15px;
-    }
-    
-    .zone-grid {
-        grid-template-columns: repeat(auto-fill, 35px);
     }
     
     .location-box {
@@ -376,7 +507,10 @@
     }
 }
 
-/* --- Print Styles (Optional) --- */
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+
 @media print {
     .refresh-controls,
     .js-refresh-btn {
@@ -387,12 +521,15 @@
         display: none;
     }
     
-    .zone-container {
+    .row-container {
         page-break-inside: avoid;
     }
 }
 
-/* --- Accessibility --- */
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
 .location-box:focus {
     outline: 3px solid #007bff;
     outline-offset: 2px;
