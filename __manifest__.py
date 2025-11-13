@@ -10,6 +10,7 @@
         - Real-time status: Free/Reserved/Occupied
         - 167 PR-1 locations tracked
         - Auto-refresh every 60 seconds
+        - Interactive grid visualization
         - Assignment wizard
         - Historical analytics
         
@@ -28,6 +29,11 @@
         'security/ir.model.access.csv',
         'views/location_occupancy_views.xml',
         'views/location_occupancy_menu.xml',
+        'views/occupancy_grid_view.xml',
+        'views/assets.xml',
+    ],
+    'qweb': [
+        'static/src/xml/occupancy_grid_templates.xml',
     ],
     'installable': True,
     'application': False,
