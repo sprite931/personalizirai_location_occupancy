@@ -9,7 +9,7 @@
             <tree string="PR-1 Location Occupancy" create="false" delete="false">
                 <field name="name" string="Location"/>
                 <field name="pr1_zone" string="Zone"/>
-                <field name="occupancy_status" string="Status" widget="badge" 
+                <field name="occupancy_status" string="Status"
                        decoration-success="occupancy_status == 'free'"
                        decoration-warning="occupancy_status == 'reserved'"
                        decoration-danger="occupancy_status == 'occupied'"/>
@@ -49,7 +49,7 @@
                         </group>
                         
                         <group string="Occupancy Status">
-                            <field name="occupancy_status" widget="badge"
+                            <field name="occupancy_status"
                                    decoration-success="occupancy_status == 'free'"
                                    decoration-warning="occupancy_status == 'reserved'"
                                    decoration-danger="occupancy_status == 'occupied'"/>
@@ -71,7 +71,7 @@
                     
                     <group string="7-Day Statistics" attrs="{'invisible': True}">
                         <group>
-                            <field name="occupancy_rate_7d" widget="percentage"/>
+                            <field name="occupancy_rate_7d" string="Utilization %"/>
                             <field name="occupancy_avg_duration" widget="float_time"/>
                         </group>
                         <group>
@@ -111,9 +111,9 @@
                 
                 <!-- Filters by Status -->
                 <separator/>
-                <filter name="filter_free" string="🟢 Free" domain="[('occupancy_status', '=', 'free')]"/>
-                <filter name="filter_reserved" string="🟡 Reserved" domain="[('occupancy_status', '=', 'reserved')]"/>
-                <filter name="filter_occupied" string="🔴 Occupied" domain="[('occupancy_status', '=', 'occupied')]"/>
+                <filter name="filter_free" string="Free" domain="[('occupancy_status', '=', 'free')]"/>
+                <filter name="filter_reserved" string="Reserved" domain="[('occupancy_status', '=', 'reserved')]"/>
+                <filter name="filter_occupied" string="Occupied" domain="[('occupancy_status', '=', 'occupied')]"/>
                 
                 <separator/>
                 <filter name="filter_not_free" string="Reserved or Occupied" domain="[('occupancy_status', 'in', ['reserved', 'occupied'])]"/>
@@ -187,9 +187,9 @@
             </p>
             <p>
                 Monitor which locations are free, reserved, or occupied.<br/>
-                • 🟢 <b>Free</b>: Available for use<br/>
-                • 🟡 <b>Reserved</b>: Assigned to order in production (physically empty)<br/>
-                • 🔴 <b>Occupied</b>: Physically contains a box
+                • Free: Available for use<br/>
+                • Reserved: Assigned to order in production (physically empty)<br/>
+                • Occupied: Physically contains a box
             </p>
         </field>
     </record>
