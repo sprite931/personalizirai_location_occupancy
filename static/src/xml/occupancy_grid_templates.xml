@@ -70,6 +70,24 @@
                 </span>
             </div>
             
+            <!-- Column Numbers Header (for visual orientation) -->
+            <div class="column-numbers">
+                <div class="column-numbers-label">
+                    Колони
+                </div>
+                <div class="column-numbers-grid">
+                    <!-- Generate column numbers based on first level's locations -->
+                    <t t-set="firstLevel" t-value="row.levels[0]"/>
+                    <t t-if="firstLevel and firstLevel.locations">
+                        <t t-foreach="firstLevel.locations" t-as="loc">
+                            <div class="column-number">
+                                <t t-esc="loc.display_name.split('-')[2]"/>
+                            </div>
+                        </t>
+                    </t>
+                </div>
+            </div>
+            
             <!-- Row Grid - Levels arranged vertically -->
             <div class="row-grid">
                 <!-- Loop through levels (E → D → C → B → A) -->
