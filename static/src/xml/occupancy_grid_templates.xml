@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <!-- Main Grid Dashboard Template -->
+    <t t-name="LocationOccupancyGrid">
+        <div class="occupancy-grid-dashboard">
+            <!-- Header with Summary & Controls -->
+            <div class="grid-header">
+                <h1 class="grid-title">📦 PR-1 Location Occupancy Map</h1>
+                
+                <div class="grid-summary">
+                    <!-- Summary Statistics -->
+                    <div class="summary-stats">
+                        <div class="summary-stat">
+                            <span class="summary-stat-icon free"></span>
+                            <span class="summary-stat-label">Free:</span>
+                            <span class="summary-stat-value summary-free">-</span>
+                        </div>
+                        
+                        <div class="summary-stat">
+                            <span class="summary-stat-icon reserved"></span>
+                            <span class="summary-stat-label">Reserved:</span>
+                            <span class="summary-stat-value summary-reserved">-</span>
+                        </div>
+                        
+                        <div class="summary-stat">
+                            <span class="summary-stat-icon occupied"></span>
+                            <span class="summary-stat-label">Occupied:</span>
+                            <span class="summary-stat-value summary-occupied">-</span>
+                        </div>
+                        
+                        <div class="summary-stat">
+                            <span class="summary-stat-label">Total:</span>
+                            <span class="summary-stat-value summary-total">-</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Refresh Controls -->
+                    <div class="refresh-controls">
+                        <span class="loading-spinner d-none"></span>
+                        <span class="text-muted">
+                            Last update: <span class="refresh-time">-</span>
+                        </span>
+                        <button class="btn btn-sm btn-primary js-refresh-btn">
+                            🔄 Refresh Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error Container -->
+            <div class="error-container"></div>
+            
+            <!-- Grid Container (zones will be rendered here) -->
+            <div class="occupancy-grid-container">
+                <!-- Zones will be dynamically rendered here -->
+            </div>
+        </div>
+    </t>
+
+    <!-- Zone Template -->
+    <t t-name="LocationOccupancyZone">
+        <div class="zone-container">
+            <!-- Zone Header -->
+            <div class="zone-header">
+                <h2 class="zone-title">
+                    <span class="zone-emoji">
+                        <t t-if="zone.name === 'malak_sklad'">🏢</t>
+                        <t t-elif="zone.name === 'calandar'">🏭</t>
+                        <t t-else="">👕</t>
+                    </span>
+                    <t t-esc="zone.label"/>
+                </h2>
+                <span class="zone-count">
+                    <t t-esc="zone.count"/> positions
+                </span>
+            </div>
+            
+            <!-- Zone Grid -->
+            <div class="zone-grid">
+                <t t-foreach="zone.locations" t-as="location">
+                    <div class="location-box"
+                         t-att-class="'location-box status-' + location.status"
+                         t-att-data-location-id="location.id"
+                         t-att-data-tooltip="location.name + ' - ' + location.status.toUpperCase() + (location.order ? ' (' + location.order + ')' : '')">
+                        <span class="location-label">
+                            <t t-esc="location.name.replace('PR-1-', '').replace('M-', 'M').replace('C-', 'C').replace('T-', 'T')"/>
+                        </span>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <!-- Location Details Modal -->
+    <t t-name="LocationDetailsModal">
+        <div class="modal fade location-details-modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            📍 Location Details: <t t-esc="location.name"/>
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Modal Body -->
+                    <div class="modal-body">
+                        <!-- Status -->
+                        <div class="detail-row">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value">
+                                <span t-att-class="'status-badge ' + location.status">
+                                    <t t-if="location.status === 'free'">🟢 FREE</t>
+                                    <t t-elif="location.status === 'reserved'">🟡 RESERVED</t>
+                                    <t t-else="">🔴 OCCUPIED</t>
+                                </span>
+                            </span>
+                        </div>
+                        
+                        <!-- Order (if exists) -->
+                        <t t-if="location.order">
+                            <div class="detail-row">
+                                <span class="detail-label">Order:</span>
+                                <span class="detail-value">
+                                    <strong><t t-esc="location.order"/></strong>
+                                </span>
+                            </div>
+                        </t>
+                        
+                        <!-- Customer (if exists) -->
+                        <t t-if="location.customer">
+                            <div class="detail-row">
+                                <span class="detail-label">Customer:</span>
+                                <span class="detail-value">
+                                    <t t-esc="location.customer"/>
+                                </span>
+                            </div>
+                        </t>
+                        
+                        <!-- Duration (if occupied/reserved) -->
+                        <t t-if="location.status !== 'free'">
+                            <div class="detail-row">
+                                <span class="detail-label">Duration:</span>
+                                <span class="detail-value">
+                                    <t t-esc="location.duration"/> days
+                                </span>
+                            </div>
+                        </t>
+                        
+                        <!-- Empty state message -->
+                        <t t-if="location.status === 'free'">
+                            <div class="alert alert-success mt-3 mb-0">
+                                <strong>✅ This location is free!</strong><br/>
+                                Ready for new order assignment.
+                            </div>
+                        </t>
+                        
+                        <!-- Reserved message -->
+                        <t t-if="location.status === 'reserved'">
+                            <div class="alert alert-warning mt-3 mb-0">
+                                <strong>⚠️ Reserved for production</strong><br/>
+                                Products are being manufactured for this location.
+                            </div>
+                        </t>
+                        
+                        <!-- Occupied message with duration warning -->
+                        <t t-if="location.status === 'occupied'">
+                            <t t-if="location.duration &gt; 7">
+                                <div class="alert alert-danger mt-3 mb-0">
+                                    <strong>⚠️ Long-term occupancy!</strong><br/>
+                                    This order has been here for <t t-esc="location.duration"/> days.
+                                    Consider checking with customer.
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="alert alert-info mt-3 mb-0">
+                                    <strong>📦 Occupied</strong><br/>
+                                    Order ready and waiting for pickup/delivery.
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                    
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            Close
+                        </button>
+                        <!-- Optional: Add action buttons -->
+                        <!--
+                        <t t-if="location.order">
+                            <button type="button" class="btn btn-primary">
+                                View Order
+                            </button>
+                        </t>
+                        -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
