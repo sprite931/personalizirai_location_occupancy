@@ -1,263 +1,128 @@
-# Changelog
+# Changelog - PersonaliziRai Location Occupancy
 
-All notable changes to the PersonaliziRai Location Occupancy module.
+## [1.0.0] - 2024-11-13
 
----
+### ✅ COMPLETED: Phase 1 + Phase 2 (Basic Models & Views)
 
-## [Unreleased] - 2024-11-13
+#### Added
+- **Stock Location Model Extensions**
+  - `occupancy_status` computed field (free/reserved/occupied)
+  - `occupancy_order_id` - linked sale order
+  - `occupancy_order_name` - order number
+  - `occupancy_magento_id` - Magento order ID
+  - `occupancy_customer` - customer name
+  - `occupancy_since` - timestamp when status changed
+  - `occupancy_duration_hours` - how long in current status
+  - `is_pr1_location` - boolean to identify PR-1 child locations
+  - `pr1_zone` - zone classification (Малък Склад/Calandar/Teniski)
+  - Placeholder fields for Phase 4 statistics
 
-### 📦 Repository Created
-- Initial GitHub repository setup
-- Comprehensive documentation structure
-- Development roadmap defined
+- **Batch Optimization**
+  - Single query for all quants (instead of per-location)
+  - Single query for all orders (instead of per-location)
+  - Performance: 500+ queries reduced to 2 queries
+  - Prevents database locks during module install
 
-### 📚 Documentation Added
-- **README.md** - Complete module overview
-- **NEXT_CHAT_CONTEXT.md** - Development instructions
-- **PHASE1_FILES.md** - Phase 1 complete code
-- **PROJECT_SUMMARY.md** - Quick reference guide
-- **CHANGELOG.md** - This file
+- **Views**
+  - Tree view with custom columns (Location, Zone, Status, Order, Customer, Duration)
+  - Search view with filters by status and zone
+  - Group By functionality (Status, Zone)
+  - Menu: Inventory → Warehouse → Location Occupancy → PR-1 Locations
 
-### 🎯 Planning Complete
-- Problem defined (race condition)
-- Solution designed (interactive grid dashboard)
-- Technical approach documented
-- 4-phase development plan created
-- Success criteria defined
+- **Security**
+  - Read access for base.group_user
+  - Full access for stock.group_stock_manager
 
-### 🔧 Technical Design
-- Database models designed
-- Computed fields approach chosen (non-stored)
-- Status detection logic defined
-- Zone identification strategy
-- JavaScript widget architecture planned
+#### Fixed
+- **XML Validation Errors** (Multiple iterations)
+  - Removed unsupported `widget="badge"` for Odoo 13
+  - Removed unsupported `widget="percentage"` for Odoo 13
+  - Removed emoji from filter labels (XML encoding issues)
+  - Simplified view structure for Odoo 13 compatibility
 
----
+- **Performance Issues**
+  - Fixed computed field causing 500+ SQL queries
+  - Implemented batch query optimization
+  - Fixed database lock during module installation
+  - Reduced page load time to <2 seconds
 
-## Planned Development Phases
+- **View Loading Issues**
+  - Added explicit `view_id` reference in action
+  - Set `priority=1` on custom views
+  - Fixed default view override
 
-### Phase 1: Foundation (2-3 hours) - NOT STARTED
-**Goal:** Basic models and status detection
+#### Known Issues
+- **Row Colors Not Working**
+  - `decoration-*` attributes don't work with `store=False` computed fields in Odoo 13
+  - Data displays correctly, but no visual color coding
+  - Will be resolved in Phase 3 with Grid Dashboard (colored boxes)
 
-- [ ] Create module structure
-- [ ] Implement stock.location inheritance
-- [ ] Add computed fields (occupancy_status, etc.)
-- [ ] Implement status detection logic
-- [ ] Add zone detection (малък_склад, calandar, teniski)
-- [ ] Create security rules
-- [ ] Test with Odoo shell
+#### Technical Details
+- **Module Structure:**
+  ```
+  personalizirai_location_occupancy/
+  ├── __init__.py
+  ├── __manifest__.py
+  ├── models/
+  │   ├── __init__.py
+  │   └── stock_location.py (400+ lines)
+  ├── views/
+  │   ├── location_occupancy_views.xml
+  │   └── location_occupancy_menu.xml
+  └── security/
+      └── ir.model.access.csv
+  ```
 
-**Deliverables:**
-- Working computed fields
-- 167 PR-1 locations detected
-- Status correctly computed (free/reserved/occupied)
+- **Database Impact:**
+  - No new tables created (inherit existing stock.location)
+  - All fields are computed (no storage overhead)
+  - 2 additional queries per page load (optimized batch queries)
 
----
+- **Dependencies:**
+  - base
+  - stock
+  - sale
+  - web
 
-### Phase 2: Basic Views (1-2 hours) - NOT STARTED
-**Goal:** Tree view with filters
+#### Testing Results
+- ✅ Module installs without errors
+- ✅ 167 PR-1 locations detected correctly
+- ✅ Zones identified correctly (M-*, C-*, T-*)
+- ✅ Status computation works (free/reserved/occupied)
+- ✅ Order info populated correctly
+- ✅ Duration calculated correctly
+- ✅ Filters work (Free, Reserved, Occupied)
+- ✅ Group By works (Status, Zone)
+- ✅ Performance <2 seconds page load
+- ❌ Row decoration colors not working (known Odoo 13 limitation)
 
-- [ ] Create tree view with color coding
-- [ ] Add search view with filters
-- [ ] Implement status filters (free/reserved/occupied)
-- [ ] Add zone filters
-- [ ] Create menu structure
-- [ ] Test filtering and grouping
-
-**Deliverables:**
-- Functional tree view
-- Color-coded rows (green/yellow/red)
-- Working filters
-- Menu under Sales
-
----
-
-### Phase 3: Interactive Grid (3-4 hours) - NOT STARTED
-**Goal:** Visual grid dashboard
-
-- [ ] Create JavaScript widget
-- [ ] Design QWeb template
-- [ ] Implement responsive CSS
-- [ ] Add auto-refresh (60s)
-- [ ] Implement click handlers
-- [ ] Add summary statistics
-- [ ] Test on tablet and laptop
-- [ ] Optimize performance
-
-**Deliverables:**
-- Interactive grid visualization
-- Organized by zones
-- Auto-refresh working
-- Responsive design
-- Click-to-view details
-
----
-
-### Phase 4: History & Assignment (2-3 hours) - NOT STARTED
-**Goal:** Historical tracking and assignment wizard
-
-- [ ] Create location.occupancy.history model
-- [ ] Implement history tracking cron job
-- [ ] Add 7-day statistics computation
-- [ ] Create assignment wizard model
-- [ ] Implement assignment wizard view
-- [ ] Add history report views
-- [ ] Implement utilization analytics
-
-**Deliverables:**
-- Historical tracking active
-- 7-day statistics available
-- Assignment wizard functional
-- Utilization reports available
+#### Deployment
+- **Server:** personaliziraibyi.ns1.bg
+- **Database:** byi_print_staging_personalizirai_stenik_cloud
+- **Module Path:** /odoo/custom/addons/personalizirai_location_occupancy
+- **Status:** ✅ Installed and functional
+- **Version:** 1.0.0
 
 ---
 
-## Future Enhancements (Post-Launch)
+## 🚀 Next: Phase 3 - Interactive Grid Dashboard
 
-### v1.1.0 - Advanced Analytics
-- [ ] Monthly utilization reports
-- [ ] High/low traffic location identification
-- [ ] Predictive analytics (when location will be free)
-- [ ] Heatmap visualization
-- [ ] Export to Excel/PDF
-
-### v1.2.0 - Mobile App
-- [ ] Dedicated mobile app (PWA)
-- [ ] QR code scanning
-- [ ] Push notifications for status changes
-- [ ] Offline mode
-- [ ] Voice commands
-
-### v1.3.0 - Integration
-- [ ] Integration with barcode scanners
-- [ ] Integration with warehouse monitoring module
-- [ ] API endpoints for external systems
-- [ ] Webhook notifications
-
-### v2.0.0 - Multi-Warehouse
-- [ ] Support for multiple warehouses
-- [ ] Cross-warehouse transfers
-- [ ] Warehouse comparison analytics
-- [ ] Global dashboard
+See `PHASE3_READY.md` for next steps.
 
 ---
 
-## Development Notes
+## Commit History (Nov 13, 2024)
 
-### Design Decisions
-
-**Why Computed Fields (non-stored)?**
-- Data changes frequently
-- Real-time accuracy required
-- Acceptable performance for 167 locations
-- Simpler logic (no state management)
-
-**Why Grid vs List?**
-- Visual representation matches physical layout
-- Easier to spot patterns
-- More intuitive for warehouse staff
-- Better for spatial understanding
-
-**Why Auto-refresh (60s)?**
-- Balance between freshness and performance
-- Not critical-path data (not realtime safety)
-- Reduces server load
-- Good enough for decision making
-
-**Why JavaScript Widget?**
-- Rich interactivity
-- Auto-refresh without page reload
-- Click handlers for details
-- Custom visualization
+- `541f7cc` - Phase 1: Basic models and logic - Foundation files
+- `680c059` - Phase 2: Basic views and menu
+- `92f06f4` - Fix: Odoo 13 compatibility - remove unsupported widgets
+- `c917d4a` - Critical fix: Optimize computed fields with batch queries
+- `ff2d2a1` - Fix: Minimal views for Odoo 13 compatibility
+- `2187492` - Fix: Force custom view to load with explicit view_id reference
+- `9a5e4dd` - Try fix: Add invisible="0" to force status field evaluation
 
 ---
 
-## Known Limitations
-
-### Current Design
-- PR-1 locations only (not other warehouses)
-- 60-second refresh (not real-time)
-- No push notifications
-- No mobile app (responsive web only)
-- No historical data export yet
-
-### Technical Constraints
-- Computed fields recalculate on every view
-- Performance may degrade with 1000+ locations
-- Requires JavaScript enabled in browser
-- Auto-refresh uses client-side timer
-
----
-
-## Performance Benchmarks
-
-### Target Metrics
-- Page load: < 2 seconds
-- Refresh cycle: < 1 second
-- Support: 167 locations minimum
-- Concurrent users: 10+ simultaneous
-
-### Actual Metrics
-*To be measured after Phase 3 implementation*
-
----
-
-## Testing Coverage
-
-### Phase 1 Tests
-- [ ] Module installation
-- [ ] 167 locations detected
-- [ ] Status computation accuracy
-- [ ] Zone detection accuracy
-- [ ] Order info population
-- [ ] Duration calculation
-
-### Phase 2 Tests
-- [ ] Menu navigation
-- [ ] Tree view rendering
-- [ ] Color coding
-- [ ] Filter functionality
-- [ ] Grouping functionality
-- [ ] Search functionality
-
-### Phase 3 Tests
-- [ ] Grid rendering
-- [ ] Auto-refresh
-- [ ] Click handlers
-- [ ] Responsive layout (tablet)
-- [ ] Responsive layout (laptop)
-- [ ] Performance under load
-- [ ] Browser compatibility
-
-### Phase 4 Tests
-- [ ] History tracking
-- [ ] Statistics accuracy
-- [ ] Assignment validation
-- [ ] Wizard functionality
-- [ ] Cron job execution
-
----
-
-## Version History
-
-**v0.1.0** - 2024-11-13 (Documentation Phase)
-- Repository created
-- Documentation complete
-- Ready for development
-
----
-
-## Contributors
-
-- Daniel (sprite931) - Project Lead & Developer
-- Claude (Anthropic) - Development Assistant
-
----
-
-## License
-
-LGPL-3
-
----
-
-**Next Update:** After Phase 1 completion
+**Total Development Time:** ~3 hours
+**Lines of Code:** ~500 lines
+**SQL Queries Optimized:** 500+ → 2
