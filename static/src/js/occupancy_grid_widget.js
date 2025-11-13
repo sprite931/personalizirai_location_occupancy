@@ -11,16 +11,17 @@ odoo.define('personalizirai_location_occupancy.GridWidget', function (require) {
     /**
      * Interactive Grid Dashboard Widget for Location Occupancy
      * 
-     * Displays 167 PR-1 locations as colored boxes organized by zones:
-     * - Малък Склад (100 positions)
-     * - Calandar (30 positions)
-     * - Teniski (37 positions)
+     * Displays PR-1 locations organized by physical structure:
+     * - Row A (Редица A) - 70 positions
+     * - Row B (Редица B) - 61 positions
+     * Each row has 5 levels: E (top) → D → C → B → A (bottom)
      * 
      * Features:
      * - Color-coded status (green/yellow/red)
      * - Click to view details
      * - Auto-refresh every 60 seconds
      * - Summary statistics
+     * - Physical warehouse layout visualization
      */
     var OccupancyGridWidget = AbstractAction.extend({
         template: 'LocationOccupancyGrid',
@@ -111,20 +112,22 @@ odoo.define('personalizirai_location_occupancy.GridWidget', function (require) {
             // Render summary
             this._renderSummary();
 
-            // Render each zone
-            this.gridData.zones.forEach(function(zone) {
-                var $zone = $(QWeb.render('LocationOccupancyZone', {
-                    zone: zone
-                }));
-                
-                // Add click handlers to location boxes
-                $zone.find('.location-box').on('click', function() {
-                    var locationId = $(this).data('location-id');
-                    self._showLocationDetails(locationId);
+            // Render each row (Row A, Row B)
+            if (this.gridData.rows) {
+                this.gridData.rows.forEach(function(row) {
+                    var $row = $(QWeb.render('LocationOccupancyRow', {
+                        row: row
+                    }));
+                    
+                    // Add click handlers to location boxes
+                    $row.find('.location-box').on('click', function() {
+                        var locationId = $(this).data('location-id');
+                        self._showLocationDetails(locationId);
+                    });
+                    
+                    $grid.append($row);
                 });
-                
-                $grid.append($zone);
-            });
+            }
 
             // Update last refresh time
             this._updateRefreshTime();
@@ -141,30 +144,34 @@ odoo.define('personalizirai_location_occupancy.GridWidget', function (require) {
             this.$('.summary-free').text(summary.free);
             this.$('.summary-reserved').text(summary.reserved);
             this.$('.summary-occupied').text(summary.occupied);
-
-            // Update percentage bars (optional visual enhancement)
-            var total = summary.total || 1;
-            this.$('.summary-free-bar').css('width', (summary.free / total * 100) + '%');
-            this.$('.summary-reserved-bar').css('width', (summary.reserved / total * 100) + '%');
-            this.$('.summary-occupied-bar').css('width', (summary.occupied / total * 100) + '%');
         },
 
         /**
          * Show location details in modal
          */
         _showLocationDetails: function (locationId) {
-            if (!this.gridData) return;
+            if (!this.gridData || !this.gridData.rows) return;
 
-            // Find location in data
+            // Find location in data (search through rows and levels)
             var location = null;
-            this.gridData.zones.forEach(function(zone) {
-                var found = zone.locations.find(function(loc) {
-                    return loc.id === locationId;
+            this.gridData.rows.forEach(function(row) {
+                if (location) return; // Already found
+                
+                row.levels.forEach(function(level) {
+                    if (location) return; // Already found
+                    
+                    var found = level.locations.find(function(loc) {
+                        return loc.id === locationId;
+                    });
+                    
+                    if (found) location = found;
                 });
-                if (found) location = found;
             });
 
-            if (!location) return;
+            if (!location) {
+                console.error('Location not found:', locationId);
+                return;
+            }
 
             // Render modal with location details
             var $modal = $(QWeb.render('LocationDetailsModal', {
