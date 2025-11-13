@@ -50,34 +50,56 @@
             <!-- Error Container -->
             <div class="error-container"></div>
             
-            <!-- Grid Container (zones will be rendered here) -->
+            <!-- Grid Container (rows will be rendered here) -->
             <div class="occupancy-grid-container">
-                <!-- Zones will be dynamically rendered here -->
+                <!-- Rows will be dynamically rendered here -->
             </div>
         </div>
     </t>
 
-    <!-- Zone Template -->
-    <t t-name="LocationOccupancyZone">
-        <div class="zone-container">
-            <!-- Zone Header -->
-            <div class="zone-header">
-                <h2 class="zone-title">
-                    📦 <t t-esc="zone.label"/>
-                </h2>                <span class="zone-count">
-                    <t t-esc="zone.count"/> positions
+    <!-- Row Template - Physical warehouse structure -->
+    <t t-name="LocationOccupancyRow">
+        <div class="row-container">
+            <!-- Row Header -->
+            <div class="row-header">
+                <h2 class="row-title">
+                    <t t-esc="row.emoji"/> <t t-esc="row.label"/>
+                </h2>
+                <span class="row-count">
+                    <t t-esc="row.count"/> позиции
                 </span>
             </div>
             
-            <!-- Zone Grid -->
-            <div class="zone-grid">
-                <t t-foreach="zone.locations" t-as="location">
-                    <div t-attf-class="location-box status-{{location.status}}"
-                         t-att-data-location-id="location.id"
-                         t-att-data-tooltip="location.name + ' - ' + location.status.toUpperCase() + (location.order ? ' (' + location.order + ')' : '')">
-                        <span class="location-label">
-                            <t t-esc="location.name.replace('PR-1-', '').replace('M-', 'M').replace('C-', 'C').replace('T-', 'T')"/>
-                        </span>
+            <!-- Row Grid - Levels arranged vertically -->
+            <div class="row-grid">
+                <!-- Loop through levels (E → D → C → B → A) -->
+                <t t-foreach="row.levels" t-as="level">
+                    <div class="level-row">
+                        <!-- Level Label (left side) -->
+                        <div class="level-label">
+                            <span class="level-name"><t t-esc="level.name"/></span>
+                            <span class="level-info"><t t-esc="level.label"/></span>
+                        </div>
+                        
+                        <!-- Level Locations (horizontal grid) -->
+                        <div class="level-locations">
+                            <t t-foreach="level.locations" t-as="location">
+                                <div t-attf-class="location-box status-{{location.status}}"
+                                     t-att-data-location-id="location.id"
+                                     t-att-data-tooltip="location.display_name + ' - ' + location.status.toUpperCase() + (location.order ? ' (' + location.order + ')' : '')">
+                                    <span class="location-label">
+                                        <t t-esc="location.display_name"/>
+                                    </span>
+                                </div>
+                            </t>
+                            
+                            <!-- Show empty state if no locations -->
+                            <t t-if="!level.locations || level.locations.length === 0">
+                                <div class="level-empty">
+                                    <span class="text-muted">No locations</span>
+                                </div>
+                            </t>
+                        </div>
                     </div>
                 </t>
             </div>
@@ -92,7 +114,7 @@
                     <!-- Modal Header -->
                     <div class="modal-header">
                         <h5 class="modal-title">
-                            📍 Location Details: <t t-esc="location.name"/>
+                            📍 Location Details: <t t-esc="location.display_name"/>
                         </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
