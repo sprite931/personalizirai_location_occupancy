@@ -145,6 +145,18 @@
                             </div>
                         </t>
                         
+                        <!-- Transport Unit / Box (if occupied) -->
+                        <t t-if="location.transport_unit">
+                            <div class="detail-row">
+                                <span class="detail-label">Transport Box:</span>
+                                <span class="detail-value">
+                                    <span class="badge badge-danger">
+                                        📦 <t t-esc="location.transport_unit"/>
+                                    </span>
+                                </span>
+                            </div>
+                        </t>
+                        
                         <!-- Customer (if exists) -->
                         <t t-if="location.customer">
                             <div class="detail-row">
@@ -177,7 +189,7 @@
                         <t t-if="location.status === 'reserved'">
                             <div class="alert alert-warning mt-3 mb-0">
                                 <strong>⚠️ Reserved for production</strong><br/>
-                                Products are being manufactured for this location.
+                                Products are being manufactured. Waiting for transport box assignment.
                             </div>
                         </t>
                         
@@ -192,7 +204,7 @@
                             </t>
                             <t t-else="">
                                 <div class="alert alert-info mt-3 mb-0">
-                                    <strong>📦 Occupied</strong><br/>
+                                    <strong>📦 Occupied with physical box</strong><br/>
                                     Order ready and waiting for pickup/delivery.
                                 </div>
                             </t>
