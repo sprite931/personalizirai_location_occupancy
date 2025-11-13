@@ -50,12 +50,13 @@ class LocationOccupancyController(http.Controller):
             # Get location model
             Location = request.env['stock.location']
             
-            # Query all PR-1 locations (with computed fields)
             # Odoo 13: read() will trigger compute for all 167 locations
+            # Query all PR-1 locations (with computed fields)
+            # Filter by parent location_id = 19 (PR-1 warehouse)
             locations = Location.search([
                 ('usage', '=', 'internal'),
-                ('barcode', 'like', 'PR-1-%')
-            ], order='barcode')
+                ('location_id', '=', 19)
+            ], order='name')
             
             _logger.info(f"📦 Found {len(locations)} PR-1 locations")
             
@@ -64,9 +65,9 @@ class LocationOccupancyController(http.Controller):
                 'id', 'name', 'barcode',
                 'occupancy_status',
                 'occupancy_order_name',
-                'occupancy_customer_name',
-                'occupancy_duration_days',
-                'occupancy_zone'
+                'occupancy_customer',
+                'occupancy_duration_hours',
+                'pr1_zone'
             ])
             
             # Initialize summary counters
@@ -77,32 +78,17 @@ class LocationOccupancyController(http.Controller):
                 'occupied': 0
             }
             
-            # Group by zones
-            zones_dict = {
-                'malak_sklad': {
-                    'name': 'malak_sklad',
-                    'label': 'Малък Склад',
-                    'count': 0,
-                    'locations': []
-                },
-                'calandar': {
-                    'name': 'calandar',
-                    'label': 'Calandar',
-                    'count': 0,
-                    'locations': []
-                },
-                'teniski': {
-                    'name': 'teniski',
-                    'label': 'Teniski',
-                    'count': 0,
-                    'locations': []
-                }
+            # Single zone - PR-1
+            pr1_zone = {
+                'name': 'pr1',
+                'label': 'PR-1',
+                'count': len(location_data),
+                'locations': []
             }
             
             # Process each location
             for loc in location_data:
                 status = loc['occupancy_status']
-                zone = loc['occupancy_zone'] or 'malak_sklad'  # Default zone
                 
                 # Update summary
                 if status == 'free':
@@ -115,29 +101,33 @@ class LocationOccupancyController(http.Controller):
                 # Format location data for frontend
                 location_item = {
                     'id': loc['id'],
-                    'name': loc['barcode'] or loc['name'],  # Use barcode (M-001)
+                    'name': loc['name'],  # Keep full name (A-A-01)
                     'status': status,
                     'order': loc['occupancy_order_name'] or None,
-                    'customer': loc['occupancy_customer_name'] or None,
-                    'duration': round(loc['occupancy_duration_days'] or 0, 1)
+                    'customer': loc['occupancy_customer'] or None,
+                    'duration': round((loc['occupancy_duration_hours'] or 0) / 24, 1)
                 }
                 
-                # Add to appropriate zone
-                if zone in zones_dict:
-                    zones_dict[zone]['locations'].append(location_item)
-                    zones_dict[zone]['count'] += 1
+                pr1_zone['locations'].append(location_item)
             
-            # Convert zones dict to list (preserve order)
-            zones = [
-                zones_dict['malak_sklad'],
-                zones_dict['calandar'],
-                zones_dict['teniski']
-            ]
+            # Sort by physical location: Row (A/B) -> Level (A-E) -> Column (number)
+            def sort_key(loc):
+                name = loc['name']
+                try:
+                    parts = name.split('-')
+                    row = parts[0]      # A or B
+                    level = parts[1]    # A, B, C, D, E
+                    col = int(parts[2]) # 01, 02, 03...
+                    return (row, level, col)
+                except:
+                    return (name, '', 999)
+            
+            pr1_zone['locations'].sort(key=sort_key)
             
             response = {
                 'success': True,
                 'summary': summary,
-                'zones': zones
+                'zones': [pr1_zone]  # Single zone
             }
             
             _logger.info(f"✅ Grid data prepared: {summary}")

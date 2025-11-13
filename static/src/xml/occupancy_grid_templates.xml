@@ -63,14 +63,8 @@
             <!-- Zone Header -->
             <div class="zone-header">
                 <h2 class="zone-title">
-                    <span class="zone-emoji">
-                        <t t-if="zone.name === 'malak_sklad'">🏢</t>
-                        <t t-elif="zone.name === 'calandar'">🏭</t>
-                        <t t-else="">👕</t>
-                    </span>
-                    <t t-esc="zone.label"/>
-                </h2>
-                <span class="zone-count">
+                    📦 <t t-esc="zone.label"/>
+                </h2>                <span class="zone-count">
                     <t t-esc="zone.count"/> positions
                 </span>
             </div>
@@ -78,8 +72,7 @@
             <!-- Zone Grid -->
             <div class="zone-grid">
                 <t t-foreach="zone.locations" t-as="location">
-                    <div class="location-box"
-                         t-att-class="'location-box status-' + location.status"
+                    <div t-attf-class="location-box status-{{location.status}}"
                          t-att-data-location-id="location.id"
                          t-att-data-tooltip="location.name + ' - ' + location.status.toUpperCase() + (location.order ? ' (' + location.order + ')' : '')">
                         <span class="location-label">
