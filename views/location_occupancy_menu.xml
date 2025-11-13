@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Menu: PR-1 Location Occupancy -->
+    <menuitem 
+        id="menu_location_occupancy_root"
+        name="Location Occupancy"
+        parent="stock.menu_stock_warehouse_mgmt"
+        sequence="50"/>
+    
+    <menuitem 
+        id="menu_location_occupancy"
+        name="PR-1 Locations"
+        parent="menu_location_occupancy_root"
+        action="action_location_occupancy"
+        sequence="10"/>
+
+</odoo>

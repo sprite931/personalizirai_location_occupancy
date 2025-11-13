@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Tree View: Location List with Status -->
+    <record id="view_stock_location_occupancy_tree" model="ir.ui.view">
+        <field name="name">stock.location.occupancy.tree</field>
+        <field name="model">stock.location</field>
+        <field name="arch" type="xml">
+            <tree string="PR-1 Location Occupancy" create="false" delete="false">
+                <field name="name" string="Location"/>
+                <field name="pr1_zone" string="Zone"/>
+                <field name="occupancy_status" string="Status" widget="badge" 
+                       decoration-success="occupancy_status == 'free'"
+                       decoration-warning="occupancy_status == 'reserved'"
+                       decoration-danger="occupancy_status == 'occupied'"/>
+                <field name="occupancy_order_name" string="Order"/>
+                <field name="occupancy_magento_id" string="Magento ID"/>
+                <field name="occupancy_customer" string="Customer"/>
+                <field name="occupancy_duration_hours" string="Duration (h)" widget="float_time"/>
+                <field name="occupancy_since" string="Since"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Form View: Location Details -->
+    <record id="view_stock_location_occupancy_form" model="ir.ui.view">
+        <field name="name">stock.location.occupancy.form</field>
+        <field name="model">stock.location</field>
+        <field name="arch" type="xml">
+            <form string="Location Occupancy Details" create="false" delete="false">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Location Info">
+                            <field name="pr1_zone" string="Zone"/>
+                            <field name="location_id" string="Parent Location" readonly="1"/>
+                            <field name="complete_name" readonly="1"/>
+                        </group>
+                        
+                        <group string="Occupancy Status">
+                            <field name="occupancy_status" widget="badge"
+                                   decoration-success="occupancy_status == 'free'"
+                                   decoration-warning="occupancy_status == 'reserved'"
+                                   decoration-danger="occupancy_status == 'occupied'"/>
+                            <field name="occupancy_since"/>
+                            <field name="occupancy_duration_hours" widget="float_time"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Order Information" attrs="{'invisible': [('occupancy_status', '=', 'free')]}">
+                        <group>
+                            <field name="occupancy_order_id" readonly="1"/>
+                            <field name="occupancy_order_name" readonly="1"/>
+                            <field name="occupancy_magento_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="occupancy_customer" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="7-Day Statistics" attrs="{'invisible': True}">
+                        <group>
+                            <field name="occupancy_rate_7d" widget="percentage"/>
+                            <field name="occupancy_avg_duration" widget="float_time"/>
+                        </group>
+                        <group>
+                            <field name="occupancy_times_used_7d"/>
+                            <field name="occupancy_last_order"/>
+                            <field name="occupancy_last_freed"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Stock on Hand">
+                            <field name="quant_ids" context="{'search_default_internal_loc': 1}">
+                                <tree>
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="reserved_quantity"/>
+                                    <field name="package_id" groups="stock.group_tracking_lot"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Search View: Filters and Groups -->
+    <record id="view_stock_location_occupancy_search" model="ir.ui.view">
+        <field name="name">stock.location.occupancy.search</field>
+        <field name="model">stock.location</field>
+        <field name="arch" type="xml">
+            <search string="Location Occupancy Search">
+                <!-- Search Fields -->
+                <field name="name" string="Location" filter_domain="[('name', 'ilike', self)]"/>
+                <field name="occupancy_order_name" string="Order" filter_domain="[('occupancy_order_name', 'ilike', self)]"/>
+                <field name="occupancy_customer" string="Customer" filter_domain="[('occupancy_customer', 'ilike', self)]"/>
+                
+                <!-- Filters by Status -->
+                <separator/>
+                <filter name="filter_free" string="🟢 Free" domain="[('occupancy_status', '=', 'free')]"/>
+                <filter name="filter_reserved" string="🟡 Reserved" domain="[('occupancy_status', '=', 'reserved')]"/>
+                <filter name="filter_occupied" string="🔴 Occupied" domain="[('occupancy_status', '=', 'occupied')]"/>
+                
+                <separator/>
+                <filter name="filter_not_free" string="Reserved or Occupied" domain="[('occupancy_status', 'in', ['reserved', 'occupied'])]"/>
+                
+                <!-- Filters by Zone -->
+                <separator/>
+                <filter name="filter_malak_sklad" string="Малък Склад" domain="[('pr1_zone', '=', 'malak_sklad')]"/>
+                <filter name="filter_calandar" string="Calandar" domain="[('pr1_zone', '=', 'calandar')]"/>
+                <filter name="filter_teniski" string="Teniski" domain="[('pr1_zone', '=', 'teniski')]"/>
+                
+                <!-- Group By -->
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status" context="{'group_by': 'occupancy_status'}"/>
+                    <filter name="group_zone" string="Zone" context="{'group_by': 'pr1_zone'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Kanban View: Card Layout (Optional) -->
+    <record id="view_stock_location_occupancy_kanban" model="ir.ui.view">
+        <field name="name">stock.location.occupancy.kanban</field>
+        <field name="model">stock.location</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" create="false" delete="false">
+                <field name="name"/>
+                <field name="pr1_zone"/>
+                <field name="occupancy_status"/>
+                <field name="occupancy_order_name"/>
+                <field name="occupancy_customer"/>
+                <field name="occupancy_duration_hours"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                                <span t-if="record.occupancy_status.raw_value == 'free'" class="badge badge-success">Free</span>
+                                <span t-if="record.occupancy_status.raw_value == 'reserved'" class="badge badge-warning">Reserved</span>
+                                <span t-if="record.occupancy_status.raw_value == 'occupied'" class="badge badge-danger">Occupied</span>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <field name="pr1_zone"/>
+                                <t t-if="record.occupancy_order_name.raw_value">
+                                    <br/>
+                                    <strong>Order:</strong> <field name="occupancy_order_name"/><br/>
+                                    <strong>Customer:</strong> <field name="occupancy_customer"/><br/>
+                                    <strong>Duration:</strong> <field name="occupancy_duration_hours" widget="float_time"/>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- Action: Open PR-1 Location Occupancy -->
+    <record id="action_location_occupancy" model="ir.actions.act_window">
+        <field name="name">PR-1 Location Occupancy</field>
+        <field name="res_model">stock.location</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="domain">[('is_pr1_location', '=', True)]</field>
+        <field name="context">{'search_default_filter_not_free': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Real-time PR-1 location occupancy tracking
+            </p>
+            <p>
+                Monitor which locations are free, reserved, or occupied.<br/>
+                • 🟢 <b>Free</b>: Available for use<br/>
+                • 🟡 <b>Reserved</b>: Assigned to order in production (physically empty)<br/>
+                • 🔴 <b>Occupied</b>: Physically contains a box
+            </p>
+        </field>
+    </record>
+
+</odoo>

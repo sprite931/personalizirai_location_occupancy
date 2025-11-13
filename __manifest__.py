@@ -26,7 +26,8 @@
     ],
     'data': [
         'security/ir.model.access.csv',
-        # Views will be added in Phase 2
+        'views/location_occupancy_views.xml',
+        'views/location_occupancy_menu.xml',
     ],
     'installable': True,
     'application': False,
