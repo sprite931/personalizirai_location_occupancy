@@ -1,0 +1,415 @@
+/* ============================================================
+   PersonaliziRai Location Occupancy Grid Dashboard Styles
+   ============================================================ */
+
+/* --- Container & Layout --- */
+.occupancy-grid-dashboard {
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.occupancy-grid-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* --- Header & Summary --- */
+.grid-header {
+    background: white;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.grid-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin: 0 0 15px 0;
+}
+
+.grid-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.summary-stats {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.summary-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.summary-stat-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.summary-stat-icon.free {
+    background-color: #28a745;
+}
+
+.summary-stat-icon.reserved {
+    background-color: #ffc107;
+}
+
+.summary-stat-icon.occupied {
+    background-color: #dc3545;
+}
+
+.summary-stat-label {
+    font-size: 14px;
+    color: #666;
+}
+
+.summary-stat-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* --- Refresh Controls --- */
+.refresh-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.refresh-time {
+    font-size: 12px;
+    color: #999;
+}
+
+.js-refresh-btn {
+    padding: 6px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- Zone Container --- */
+.zone-container {
+    background: white;
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.zone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.zone-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.zone-title .zone-emoji {
+    margin-right: 10px;
+}
+
+.zone-count {
+    font-size: 14px;
+    color: #666;
+    background: #f8f9fa;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+/* --- Grid Layout --- */
+.zone-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 44px);
+    gap: 4px;
+    justify-content: start;
+}
+
+/* Alternative: Fixed 10-column layout for consistency */
+.zone-grid.grid-10-col {
+    grid-template-columns: repeat(10, 44px);
+}
+
+/* --- Location Box --- */
+.location-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Status Colors */
+.location-box.status-free {
+    background-color: #28a745;
+    color: white;
+}
+
+.location-box.status-reserved {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.location-box.status-occupied {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Hover Effect */
+.location-box:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+    border-color: #333;
+}
+
+/* Active/Click Effect */
+.location-box:active {
+    transform: scale(1.05);
+}
+
+/* Tooltip on hover */
+.location-box::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    margin-bottom: 5px;
+    z-index: 1000;
+}
+
+.location-box:hover::after {
+    opacity: 1;
+}
+
+/* Location Label */
+.location-label {
+    text-align: center;
+    line-height: 1;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* --- Details Modal --- */
+.location-details-modal .modal-content {
+    border-radius: 8px;
+}
+
+.location-details-modal .modal-header {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.location-details-modal .modal-title {
+    font-weight: bold;
+}
+
+.location-details-modal .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.location-details-modal .detail-row:last-child {
+    border-bottom: none;
+}
+
+.location-details-modal .detail-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.location-details-modal .detail-value {
+    color: #333;
+    text-align: right;
+}
+
+.location-details-modal .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.location-details-modal .status-badge.free {
+    background-color: #28a745;
+    color: white;
+}
+
+.location-details-modal .status-badge.reserved {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.location-details-modal .status-badge.occupied {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* --- Error Container --- */
+.error-container {
+    margin-bottom: 20px;
+}
+
+/* --- Responsive Design --- */
+
+/* Tablet (1024px and below) */
+@media (max-width: 1024px) {
+    .occupancy-grid-dashboard {
+        padding: 15px;
+    }
+    
+    .grid-summary {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .zone-grid {
+        grid-template-columns: repeat(auto-fill, 42px);
+        gap: 3px;
+    }
+    
+    .location-box {
+        width: 42px;
+        height: 42px;
+        font-size: 9px;
+    }
+}
+
+/* Mobile (768px and below) */
+@media (max-width: 768px) {
+    .grid-title {
+        font-size: 20px;
+    }
+    
+    .summary-stats {
+        gap: 15px;
+    }
+    
+    .zone-grid {
+        grid-template-columns: repeat(auto-fill, 38px);
+        gap: 2px;
+    }
+    
+    .location-box {
+        width: 38px;
+        height: 38px;
+        font-size: 8px;
+    }
+    
+    .zone-title {
+        font-size: 18px;
+    }
+}
+
+/* Small mobile (480px and below) */
+@media (max-width: 480px) {
+    .occupancy-grid-dashboard {
+        padding: 10px;
+    }
+    
+    .grid-header {
+        padding: 15px;
+    }
+    
+    .zone-container {
+        padding: 15px;
+    }
+    
+    .zone-grid {
+        grid-template-columns: repeat(auto-fill, 35px);
+    }
+    
+    .location-box {
+        width: 35px;
+        height: 35px;
+        font-size: 7px;
+    }
+}
+
+/* --- Print Styles (Optional) --- */
+@media print {
+    .refresh-controls,
+    .js-refresh-btn {
+        display: none;
+    }
+    
+    .location-box:hover::after {
+        display: none;
+    }
+    
+    .zone-container {
+        page-break-inside: avoid;
+    }
+}
+
+/* --- Accessibility --- */
+.location-box:focus {
+    outline: 3px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .location-box {
+        border-width: 3px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .location-box,
+    .loading-spinner {
+        transition: none;
+        animation: none;
+    }
+}
