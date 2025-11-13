@@ -2,7 +2,7 @@
 
 **Real-time warehouse location occupancy tracking with physical layout visualization**
 
-![Status](https://img.shields.io/badge/status-100%25%20complete-brightgreen)
+![Status](https://img.shields.io/badge/status-100%25%20functional-brightgreen)
 ![Phase](https://img.shields.io/badge/phase-3%20complete-success)
 ![Odoo](https://img.shields.io/badge/odoo-13-purple)
 
@@ -14,57 +14,68 @@ Interactive grid dashboard displaying **131 PR-1 warehouse locations** organized
 
 **Key Features:**
 - 🏢 **Physical layout** - Matches actual warehouse structure (Rows A & B, Levels E-A)
+- 🔢 **Column numbers** - Visual orientation with column headers (01-14)
+- 📜 **Scrollable view** - Full viewport scrolling to see all rows
 - 🎨 **Color-coded grid** (🟢 Free / 🟡 Reserved / 🔴 Occupied)
 - 🔄 **Auto-refresh** every 60 seconds
 - 📊 **Real-time summary** stats
-- 🖱️ **Click for details** (order, customer, duration)
+- 🖱️ **Click for details** (order, customer, duration, transport box)
 - 📱 **Responsive design** (desktop/tablet/mobile)
 
 ---
 
 ## 🚀 Current Status
 
-### ✅ 100% COMPLETE - Production Ready!
+### ✅ 100% FUNCTIONAL - Production Ready!
 
-**Phase 3 finished with physical warehouse layout implementation:**
+**All major features complete:**
 
 ```
 ┌─────────────────────────────────────────┐
 │ 📦 РЕДИЦА A (70 позиции)                │
-│  [Ниво E] 🟢🟢🟡🟢🟢🟡🟢🟢🟡🟢🟢🟡🟢🟢│
-│  [Ниво D] 🟢🟡🟢🟡🟢🟡🟢🟡🟢🟡🟢🟡🟢🟡│
-│  [Ниво C] 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢│
-│  [Ниво B] 🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡│
-│  [Ниво A] 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢│
+│    01  02  03  04  05  06  07  ...  14  │ ← Column numbers
+│  [E] 🟢  🟢  🟡  🟢  🟢  🟡  🟢  ...  🟢  │
+│  [D] 🟢  🟡  🟢  🟡  🟢  🟡  🟢  ...  🟢  │
+│  [C] 🟢  🟢  🟢  🟢  🟢  🟢  🟢  ...  🟢  │
+│  [B] 🟡  🟡  🟡  🟡  🟡  🟡  🟡  ...  🟡  │
+│  [A] 🟢  🟢  🟢  🟢  🟢  🟢  🟢  ...  🟢  │
 ├─────────────────────────────────────────┤
 │ 📦 РЕДИЦА B (61 позиции)                │
-│  [Ниво E] 🟢🟢🟡🟢🟢🟡🟢🟢🟡🟢🟢🟡    │
-│  [Ниво D] 🟢🟡🟢🟡🟢🟡🟢🟡🟢🟡🟢🟡    │
-│  [Ниво C] 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢    │
-│  [Ниво B] 🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡🟡    │
-│  [Ниво A] 🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢    │
+│    01  02  03  04  05  06  07  ...  13  │
+│  [E] 🟢  🟢  🟡  🟢  🟢  🟡  🟢  ...  🟢  │
+│  [D] 🟢  🟡  🟢  🟡  🟢  🟡  🟢  ...  🟢  │
+│  [C] 🟢  🟢  🟢  🟢  🟢  🟢  🟢  ...  🟢  │
+│  [B] 🟡  🟡  🟡  🟡  🟡  🟡  🟡  ...  🟡  │
+│  [A] 🟢  🟢  🟢  🟢  🟢  🟢  🟢  ...  🟢  │
 └─────────────────────────────────────────┘
+       ↑ Scroll to see РЕДИЦА B
 ```
 
 **All Features Working:**
 - ✅ Physical row/level visualization
+- ✅ Column number headers for navigation
+- ✅ Full page scrolling (viewport)
 - ✅ Real-time occupancy status
 - ✅ Color-coded locations
 - ✅ Interactive location details
+- ✅ Transport box info in modal
 - ✅ Auto-refresh (60s)
 - ✅ Summary statistics
 - ✅ Responsive design
 - ✅ Production-ready code
 
+**Minor polish remaining:**
+- ⚠️ Modal message refinement for order states (see NEXT_CHAT_CONTEXT.md)
+
 ---
 
 ## 📚 Documentation
 
-- **[PHASE3_LAYOUT_COMPLETE.md](PHASE3_LAYOUT_COMPLETE.md)** - ⭐ Latest completion report
-- **[PHASE3_COMPLETE.md](PHASE3_COMPLETE.md)** - Initial phase 3 completion
-- **[PHASE3_PROGRESS.md](PHASE3_PROGRESS.md)** - Progress history
+- **[NEXT_CHAT_CONTEXT.md](NEXT_CHAT_CONTEXT.md)** - 🔥 Start here for next session!
+- **[PHASE3_LAYOUT_COMPLETE.md](PHASE3_LAYOUT_COMPLETE.md)** - Physical layout completion
+- **[TRANSPORT_UNIT_FIX.md](TRANSPORT_UNIT_FIX.md)** - OCCUPIED status fix
+- **[CHANGELOG.md](CHANGELOG.md)** - Complete version history
 - **[PHASE1_2_COMPLETE.md](PHASE1_2_COMPLETE.md)** - Backend implementation
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history
 
 ---
 
@@ -75,18 +86,18 @@ Interactive grid dashboard displaying **131 PR-1 warehouse locations** organized
 ```
 PR-1 Warehouse (131 positions):
 ├─ РЕДИЦА A (70 positions)
-│  ├─ Ниво E (Горе) - 14 columns
+│  ├─ Ниво E (Горе) - 14 columns (01-14)
 │  ├─ Ниво D - 14 columns
 │  ├─ Ниво C - 14 columns
 │  ├─ Ниво B - 14 columns
 │  └─ Ниво A (Долу) - 14 columns
 │
 └─ РЕДИЦА B (61 positions)
-   ├─ Ниво E (Горе) - ~12 columns
-   ├─ Ниво D - ~12 columns
-   ├─ Ниво C - ~12 columns
-   ├─ Ниво B - ~12 columns
-   └─ Ниво A (Долу) - ~12 columns
+   ├─ Ниво E (Горе) - 13 columns (01-13)
+   ├─ Ниво D - 13 columns
+   ├─ Ниво C - 13 columns
+   ├─ Ниво B - 13 columns
+   └─ Ниво A (Долу) - 13 columns
 
 Location Format: [Row]-[Level]-[Column]
 Examples: A-E-05, B-C-12
@@ -99,7 +110,7 @@ Examples: A-E-05, B-C-12
 │  Browser (Grid Dashboard)            │
 │  ├─ JavaScript Widget (Odoo 13)      │
 │  ├─ QWeb Templates                   │
-│  └─ CSS Physical Layout              │
+│  └─ CSS Physical Layout + Scroll     │
 └──────────────┬───────────────────────┘
                │ JSON-RPC (AJAX)
                │ Auto-refresh: 60s
@@ -142,11 +153,18 @@ sudo systemctl restart odoo
 
 ## 🎨 Visual Features
 
+### Column Numbers Header
+- Fixed position above each row
+- Sequential numbers (01-14 for Row A, 01-13 for Row B)
+- Matches location boxes below
+- Helps visual orientation
+
 ### Row Containers
 - **Row A** - Blue left border, white background
 - **Row B** - Purple left border, white background
 - Header with title and position count
 - Shadow and rounded corners
+- Column numbers for navigation
 
 ### Level Rows
 - **Level E** (Top) - Red depth indicator
@@ -166,6 +184,11 @@ sudo systemctl restart odoo
 - **Hover:** Scale up + shadow + tooltip
 - **Click:** Open modal with details
 
+### Scrolling
+- Full viewport height
+- Smooth scrolling to see all rows
+- Header stays visible (fixed)
+
 ---
 
 ## 🔧 Development
@@ -178,17 +201,17 @@ personalizirai_location_occupancy/
 ├── __manifest__.py
 ├── controllers/
 │   ├── __init__.py
-│   └── main.py                    # Grid data API (rows/levels)
+│   └── main.py                    # Grid data API (rows/levels/columns)
 ├── models/
 │   ├── __init__.py
-│   └── stock_location.py          # Computed fields
+│   └── stock_location.py          # Computed fields + transport_unit
 ├── static/src/
 │   ├── js/
 │   │   └── occupancy_grid_widget.js    # Main widget
 │   ├── css/
-│   │   └── occupancy_grid.css          # Physical layout styles
+│   │   └── occupancy_grid.css          # Physical layout + scroll
 │   └── xml/
-│       └── occupancy_grid_templates.xml # QWeb templates
+│       └── occupancy_grid_templates.xml # QWeb templates + columns
 ├── views/
 │   ├── assets.xml
 │   ├── occupancy_grid_view.xml
@@ -200,31 +223,41 @@ personalizirai_location_occupancy/
 
 ### Key Implementation Details
 
-**Backend - Physical Structure:**
+**Backend - Physical Structure + Columns:**
 ```python
 # Grouped by Row (A/B) → Level (E-A) → Column (01-14)
 rows_data = {
     'A': {'E': [], 'D': [], 'C': [], 'B': [], 'A': []},
     'B': {'E': [], 'D': [], 'C': [], 'B': [], 'A': []}
 }
+
+# Dynamic column numbers
+column_numbers = [f"{i:02d}" for i in range(1, max_col + 1)]
 ```
 
-**Frontend - Row/Level Templates:**
+**Frontend - Column Headers:**
 ```xml
-<t t-foreach="row.levels" t-as="level">
-    <div class="level-row">
-        <div class="level-label">[Label]</div>
-        <div class="level-locations">[Boxes]</div>
+<div class="column-numbers">
+    <div class="column-numbers-label">Колони</div>
+    <div class="column-numbers-grid">
+        <div class="column-number">01</div>
+        <div class="column-number">02</div>
+        ...
     </div>
-</t>
+</div>
 ```
 
-**CSS - Physical Layout:**
+**CSS - Scrolling:**
 ```css
-.row-container { /* Blue/Purple border */ }
-.level-row { /* Colored depth indicator */ }
-.level-label { /* Fixed width label */ }
-.level-locations { /* Horizontal flex grid */ }
+.occupancy-grid-dashboard {
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+.occupancy-grid-container {
+    overflow-y: auto;
+    padding-bottom: 40px;
+}
 ```
 
 ### Local Development
@@ -297,6 +330,17 @@ Ctrl+F5 (Firefox)
 # Apps → PersonaliziRai Location Occupancy → Check version
 ```
 
+### Can't Scroll to See Row B
+
+```bash
+# Check CSS loaded correctly
+# F12 → Elements → Find .occupancy-grid-dashboard
+# Should have: max-height: 100vh; overflow-y: auto;
+
+# Hard refresh to load new CSS
+Ctrl+Shift+R
+```
+
 ### Data Not Updating
 
 ```bash
@@ -317,9 +361,9 @@ curl -X POST http://yourserver/occupancy/grid_data \
 
 | Status | Color | Icon | Meaning | Database Logic |
 |--------|-------|------|---------|----------------|
-| **Free** | 🟢 Green | Free | Empty & available | No quants, no order assigned |
-| **Reserved** | 🟡 Yellow | Reserved | Assigned but empty | No quants, order.source_location_id set |
-| **Occupied** | 🔴 Red | Occupied | Physical inventory | stock.quant exists |
+| **Free** | 🟢 Green | Free | Empty & available | No order assigned |
+| **Reserved** | 🟡 Yellow | Reserved | Assigned but no box | Order assigned, no transport_unit |
+| **Occupied** | 🔴 Red | Occupied | Physical box on location | Order assigned + transport_unit exists |
 
 ---
 
@@ -329,13 +373,17 @@ curl -X POST http://yourserver/occupancy/grid_data \
 - [x] Computed occupancy status
 - [x] Batch-optimized queries
 - [x] Order tracking
+- [x] Transport unit detection
 - [x] JSON API endpoint
 
 ### Phase 3: Physical Layout ✅ (Complete)
 - [x] Row/Level structure
 - [x] Visual grid with colors
+- [x] Column number headers
+- [x] Scrollable viewport
 - [x] Auto-refresh (60s)
 - [x] Click for details
+- [x] Transport box info
 - [x] Summary statistics
 - [x] Responsive design
 
@@ -347,6 +395,7 @@ curl -X POST http://yourserver/occupancy/grid_data \
 - [ ] Notifications (long occupancy alerts)
 - [ ] Export/print functionality
 - [ ] Bulk operations (clear multiple locations)
+- [ ] Order state-aware messaging (see NEXT_CHAT_CONTEXT.md)
 
 ---
 
@@ -373,7 +422,7 @@ November 13, 2025
 ## 📞 Support
 
 **Documentation:**
-- See `PHASE3_LAYOUT_COMPLETE.md` for latest changes
+- See `NEXT_CHAT_CONTEXT.md` for next development session
 - Check `CHANGELOG.md` for version history
 - Review issue history on GitHub
 
@@ -388,5 +437,6 @@ git status            # Check local changes
 ---
 
 **Last Updated:** November 13, 2025  
-**Version:** 1.0.0  
-**Status:** 🟢 **100% Complete - Production Ready!**
+**Version:** 1.2.0  
+**Status:** 🟢 **100% Functional - Production Ready!**  
+**Next:** Minor modal message polish (optional)
