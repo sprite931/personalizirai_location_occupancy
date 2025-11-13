@@ -77,6 +77,7 @@ class LocationOccupancyController(http.Controller):
                 'occupancy_order_name',
                 'occupancy_customer',
                 'occupancy_duration_hours',
+                'occupancy_transport_unit',  # NEW: Transport box info
                 'pr1_zone'
             ])
             
@@ -126,7 +127,8 @@ class LocationOccupancyController(http.Controller):
                             'status': status,
                             'order': loc['occupancy_order_name'] or None,
                             'customer': loc['occupancy_customer'] or None,
-                            'duration': round((loc['occupancy_duration_hours'] or 0) / 24, 1)
+                            'duration': round((loc['occupancy_duration_hours'] or 0) / 24, 1),
+                            'transport_unit': loc['occupancy_transport_unit'] or None  # NEW
                         }
                         
                         # Add to appropriate row and level
