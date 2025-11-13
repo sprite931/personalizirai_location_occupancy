@@ -154,80 +154,85 @@ class StockLocation(models.Model):
     @api.depends('name')  # Dummy depend - will trigger on context reload
     def _compute_occupancy_status(self):
         """
-        Compute real-time occupancy status:
-        - OCCUPIED: Has physical stock (stock.quant.quantity > 0)
-        - RESERVED: Assigned to order (sale_order.source_location_id)
-        - FREE: Neither of above
+        Compute real-time occupancy status with BATCH optimization.
+        
+        OPTIMIZED: Uses batch queries instead of individual searches.
+        - Single query for all quants
+        - Single query for all orders
+        - Much faster, prevents database locks
         """
-        for location in self:
-            # Only compute for PR-1 locations
-            if not location.is_pr1_location:
-                location.occupancy_status = False
-                location.occupancy_order_id = False
-                location.occupancy_order_name = False
-                location.occupancy_magento_id = False
-                location.occupancy_customer = False
-                location.occupancy_since = False
-                location.occupancy_duration_hours = 0.0
-                continue
+        # Filter only PR-1 locations
+        pr1_locations = self.filtered(lambda l: l.location_id.id == 19 or l.id == 19)
+        other_locations = self - pr1_locations
+        
+        # Set defaults for non-PR-1 locations
+        for location in other_locations:
+            location._set_default_occupancy_values()
+        
+        if not pr1_locations:
+            return
+        
+        try:
+            # BATCH QUERY 1: Get all quants for these locations
+            location_ids = pr1_locations.ids
+            quants = self.env['stock.quant'].search([
+                ('location_id', 'in', location_ids),
+                ('quantity', '>', 0)
+            ])
             
-            try:
-                # Check 1: Physical stock (OCCUPIED)
-                quants = self.env['stock.quant'].search([
-                    ('location_id', '=', location.id),
-                    ('quantity', '>', 0)
-                ], limit=1)
+            # Map: location_id -> has_stock
+            locations_with_stock = {q.location_id.id for q in quants}
+            
+            # BATCH QUERY 2: Get all orders assigned to these locations
+            orders = self.env['sale.order'].search([
+                ('source_location_id', 'in', location_ids),
+                ('state', 'in', ['manufactured', 'ready_package', 'ready_picking'])
+            ])
+            
+            # Map: location_id -> order
+            location_order_map = {o.source_location_id.id: o for o in orders}
+            
+            # Now process each location with the cached data
+            for location in pr1_locations:
+                has_stock = location.id in locations_with_stock
+                order = location_order_map.get(location.id)
                 
-                if quants:
+                if has_stock:
+                    # OCCUPIED: Has physical stock
                     location.occupancy_status = 'occupied'
-                    
-                    # Try to find associated order
-                    order = self.env['sale.order'].search([
-                        ('source_location_id', '=', location.id),
-                        ('state', 'in', ['manufactured', 'ready_package', 'ready_picking'])
-                    ], limit=1)
-                    
                     if order:
                         location._populate_order_info(order)
                     else:
-                        # Occupied but no order found
                         location.occupancy_order_id = False
                         location.occupancy_order_name = 'Unknown'
                         location.occupancy_magento_id = False
                         location.occupancy_customer = 'Unknown'
                         location.occupancy_since = False
                         location.occupancy_duration_hours = 0.0
-                    continue
-                
-                # Check 2: Reserved (assigned but no stock)
-                order = self.env['sale.order'].search([
-                    ('source_location_id', '=', location.id),
-                    ('state', 'in', ['manufactured', 'ready_package', 'ready_picking'])
-                ], limit=1)
-                
-                if order:
+                elif order:
+                    # RESERVED: Assigned but no stock
                     location.occupancy_status = 'reserved'
                     location._populate_order_info(order)
-                    continue
-                
-                # Otherwise: FREE
-                location.occupancy_status = 'free'
-                location.occupancy_order_id = False
-                location.occupancy_order_name = False
-                location.occupancy_magento_id = False
-                location.occupancy_customer = False
-                location.occupancy_since = False
-                location.occupancy_duration_hours = 0.0
-                
-            except Exception as e:
-                _logger.error(f"Error computing occupancy for {location.name}: {str(e)}")
-                location.occupancy_status = 'free'
-                location.occupancy_order_id = False
-                location.occupancy_order_name = False
-                location.occupancy_magento_id = False
-                location.occupancy_customer = False
-                location.occupancy_since = False
-                location.occupancy_duration_hours = 0.0
+                else:
+                    # FREE: Not assigned, no stock
+                    location.occupancy_status = 'free'
+                    location._set_default_occupancy_values()
+                    
+        except Exception as e:
+            _logger.error(f"Error in batch occupancy computation: {str(e)}")
+            # Set defaults for all on error
+            for location in pr1_locations:
+                location._set_default_occupancy_values()
+    
+    def _set_default_occupancy_values(self):
+        """Helper to set default/empty values"""
+        self.occupancy_status = 'free'
+        self.occupancy_order_id = False
+        self.occupancy_order_name = False
+        self.occupancy_magento_id = False
+        self.occupancy_customer = False
+        self.occupancy_since = False
+        self.occupancy_duration_hours = 0.0
     
     def _populate_order_info(self, order):
         """Helper to populate order-related fields"""
@@ -242,20 +247,8 @@ class StockLocation(models.Model):
         
         self.occupancy_customer = order.partner_id.name if order.partner_id else 'Unknown'
         
-        # Find when order entered current state
-        # Look in mail.tracking.value for state changes
-        tracking = self.env['mail.tracking.value'].search([
-            ('mail_message_id.model', '=', 'sale.order'),
-            ('mail_message_id.res_id', '=', order.id),
-            ('field', '=', 'state'),
-            ('new_value_char', 'in', ['Manufactured', 'Ready for Picking', 'Ready for Package'])
-        ], order='create_date desc', limit=1)
-        
-        if tracking and tracking.mail_message_id:
-            self.occupancy_since = tracking.mail_message_id.date
-        else:
-            # Fallback to order write_date
-            self.occupancy_since = order.write_date
+        # Use order write_date as approximation (faster than tracking search)
+        self.occupancy_since = order.write_date
         
         # Calculate duration
         if self.occupancy_since:
