@@ -76,14 +76,37 @@
                     Колони
                 </div>
                 <div class="column-numbers-grid">
-                    <!-- Generate column numbers based on first level's locations -->
-                    <t t-set="firstLevel" t-value="row.levels[0]"/>
-                    <t t-if="firstLevel and firstLevel.locations">
-                        <t t-foreach="firstLevel.locations" t-as="loc">
-                            <div class="column-number">
-                                <t t-esc="loc.display_name.split('-')[2]"/>
-                            </div>
-                        </t>
+                    <!-- Static column numbers 01-14 for Row A, 01-13 for Row B -->
+                    <t t-if="row.name === 'A'">
+                        <div class="column-number">01</div>
+                        <div class="column-number">02</div>
+                        <div class="column-number">03</div>
+                        <div class="column-number">04</div>
+                        <div class="column-number">05</div>
+                        <div class="column-number">06</div>
+                        <div class="column-number">07</div>
+                        <div class="column-number">08</div>
+                        <div class="column-number">09</div>
+                        <div class="column-number">10</div>
+                        <div class="column-number">11</div>
+                        <div class="column-number">12</div>
+                        <div class="column-number">13</div>
+                        <div class="column-number">14</div>
+                    </t>
+                    <t t-if="row.name === 'B'">
+                        <div class="column-number">01</div>
+                        <div class="column-number">02</div>
+                        <div class="column-number">03</div>
+                        <div class="column-number">04</div>
+                        <div class="column-number">05</div>
+                        <div class="column-number">06</div>
+                        <div class="column-number">07</div>
+                        <div class="column-number">08</div>
+                        <div class="column-number">09</div>
+                        <div class="column-number">10</div>
+                        <div class="column-number">11</div>
+                        <div class="column-number">12</div>
+                        <div class="column-number">13</div>
                     </t>
                 </div>
             </div>

@@ -38,6 +38,7 @@ class LocationOccupancyController(http.Controller):
                     "name": "A",
                     "label": "РЕДИЦА A",
                     "count": 70,
+                    "column_numbers": ["01", "02", ..., "14"],
                     "levels": [
                         {
                             "name": "E",
@@ -51,6 +52,7 @@ class LocationOccupancyController(http.Controller):
                     "name": "B",
                     "label": "РЕДИЦА B",
                     "count": 61,
+                    "column_numbers": ["01", "02", ..., "13"],
                     "levels": [...]
                 }
             ]
@@ -124,6 +126,7 @@ class LocationOccupancyController(http.Controller):
                             'row': row,
                             'level': level,
                             'column': col_num,
+                            'column_label': parts[2],  # "01", "02" with leading zeros
                             'status': status,
                             'order': loc['occupancy_order_name'] or None,
                             'customer': loc['occupancy_customer'] or None,
@@ -162,6 +165,16 @@ class LocationOccupancyController(http.Controller):
                 # Count locations in this row
                 row_count = sum(len(rows_data[row_name][lvl]) for lvl in level_order)
                 
+                # Determine max columns for this row
+                max_col = 0
+                for level in level_order:
+                    for loc in rows_data[row_name][level]:
+                        if loc['column'] > max_col:
+                            max_col = loc['column']
+                
+                # Generate column numbers array
+                column_numbers = [f"{i:02d}" for i in range(1, max_col + 1)]
+                
                 # Build levels array
                 levels = []
                 for level_name in level_order:
@@ -177,6 +190,7 @@ class LocationOccupancyController(http.Controller):
                     'label': f'РЕДИЦА {row_name}',
                     'emoji': '📦',
                     'count': row_count,
+                    'column_numbers': column_numbers,
                     'levels': levels
                 })
             
@@ -187,8 +201,8 @@ class LocationOccupancyController(http.Controller):
             }
             
             _logger.info(f"✅ Grid data prepared: {summary}")
-            _logger.info(f"   Row A: {rows[0]['count']} locations")
-            _logger.info(f"   Row B: {rows[1]['count']} locations")
+            _logger.info(f"   Row A: {rows[0]['count']} locations, {len(rows[0]['column_numbers'])} columns")
+            _logger.info(f"   Row B: {rows[1]['count']} locations, {len(rows[1]['column_numbers'])} columns")
             
             return response
             
